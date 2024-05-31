@@ -135,6 +135,22 @@
     #loginForm.show, #registerForm.show {
       display: flex;
     }
+
+    #logoutBtn {
+      display: none;
+      background-color: #6c757d;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-bottom: 20px;
+    }
+
+    #logoutBtn:hover {
+      background-color: #5a6268;
+    }
   </style>
 </head>
 <body>
@@ -154,6 +170,7 @@
         <p>Already have an account? <a href="#" onclick="showLoginForm()">Login</a></p>
       </div>
     </div>
+    <button id="logoutBtn" onclick="logout()">Logout</button>
     <div id="form">
       <input type="text" id="taskInput" placeholder="Enter task title">
       <select id="prioritySelect">
@@ -212,9 +229,19 @@
         document.getElementById('auth').style.display = 'none';
         document.getElementById('form').style.display = 'block';
         document.getElementById('clearAllBtn').style.display = 'block';
+        document.getElementById('logoutBtn').style.display = 'block';
       } else {
         alert("Invalid username or password!");
       }
+    }
+
+    function logout() {
+      currentUser = null;
+      document.getElementById('auth').style.display = 'block';
+      document.getElementById('form').style.display = 'none';
+      document.getElementById('clearAllBtn').style.display = 'none';
+      document.getElementById('logoutBtn').style.display = 'none';
+      document.getElementById('taskList').innerHTML = '';
     }
 
     function addTask() {

@@ -183,6 +183,21 @@
     #logoutBtn:hover {
       background-color: #5a6268;
     }
+
+    #profile {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    #profile.show {
+      display: flex;
+    }
+
+    .profile-info {
+      margin-bottom: 10px;
+    }
   </style>
 </head>
 <body>
@@ -203,6 +218,11 @@
       </div>
     </div>
     <button id="logoutBtn" onclick="logout()">Logout</button>
+    <div id="profile">
+      <h2>Profile</h2>
+      <div class="profile-info">Username: <span id="profileUsername"></span></div>
+      <button onclick="editProfile()">Edit Profile</button>
+    </div>
     <div id="form">
       <input type="text" id="taskInput" placeholder="Enter task title">
       <select id="prioritySelect">
@@ -243,7 +263,7 @@
         return;
       }
 
-      users[username] = { password: password, tasks: "" };
+      users[username] = { password: password, tasks: "", profile: { username: username } };
       localStorage.setItem("users", JSON.stringify(users));
       alert("Registration successful! Please login.");
       showLoginForm();
@@ -258,7 +278,9 @@
       if (users[username] && users[username].password === password) {
         currentUser = username;
         loadTasks();
+        loadProfile();
         document.getElementById('auth').style.display = 'none';
+        document.getElementById('profile').classList.add('show');
         document.getElementById('form').style.display = 'block';
         document.getElementById('clearAllBtn').style.display = 'block';
         document.getElementById('logoutBtn').style.display = 'block';
@@ -273,12 +295,12 @@
       document.getElementById('form').style.display = 'none';
       document.getElementById('clearAllBtn').style.display = 'none';
       document.getElementById('logoutBtn').style.display = 'none';
-      document.getElementById('taskList').innerHTML = '';
+      document.getElementById('profile').classList.remove('show');
+      document.getElementById('taskList').innerHTML = "";
+      document.getElementById('profileUsername').textContent = "";
     }
 
     function addTask() {
-      if (!currentUser) return;
-
       var taskInput = document.getElementById("taskInput");
       var taskTitle = taskInput.value.trim();
       if (taskTitle === "") return;
@@ -319,8 +341,16 @@
 
     function deleteTask(btn) {
       var taskItem = btn.parentElement;
-      taskItem.remove();
-      saveTasks();
+      taskItem.style.animation = 'slideOut 0.5s ease-out';
+      taskItem.addEventListener('animationend', () => {
+        taskItem.remove();
+        saveTasks();
+      });
+    }
+
+    @keyframes slideOut {
+      from { transform: translateX(0); opacity: 1; }
+      to { transform: translateX(100%); opacity: 0; }
     }
 
     function editTask(btn) {
@@ -392,6 +422,32 @@
       }
     }
 
+    function loadProfile() {
+      if (!currentUser) return;
+
+      var users = JSON.parse(localStorage.getItem("users")) || {};
+      if (users[currentUser] && users[currentUser].profile) {
+        var profile = users[currentUser].profile;
+        document.getElementById('profileUsername').textContent = profile.username;
+        document.getElementById('profile').classList.add('show');
+      }
+    }
+
+    function editProfile() {
+      var newUsername = prompt("Enter new username:", currentUser);
+      if (newUsername !== null && newUsername.trim() !== "") {
+        var users = JSON.parse(localStorage.getItem("users")) || {};
+        if (users[currentUser]) {
+          users[newUsername] = users[currentUser];
+          delete users[currentUser];
+          users[newUsername].profile.username = newUsername;
+          localStorage.setItem("users", JSON.stringify(users));
+          currentUser = newUsername;
+          loadProfile();
+        }
+      }
+    }
+
     document.addEventListener("DOMContentLoaded", function() {
       document.getElementById('form').style.display = 'none';
       document.getElementById('clearAllBtn').style.display = 'none';
@@ -400,3 +456,4 @@
   </script>
 </body>
 </html>
+

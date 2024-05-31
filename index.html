@@ -273,10 +273,12 @@
       document.getElementById('form').style.display = 'none';
       document.getElementById('clearAllBtn').style.display = 'none';
       document.getElementById('logoutBtn').style.display = 'none';
-      document.getElementById('taskList').innerHTML = "";
+      document.getElementById('taskList').innerHTML = '';
     }
 
     function addTask() {
+      if (!currentUser) return;
+
       var taskInput = document.getElementById("taskInput");
       var taskTitle = taskInput.value.trim();
       if (taskTitle === "") return;
@@ -317,16 +319,8 @@
 
     function deleteTask(btn) {
       var taskItem = btn.parentElement;
-      taskItem.style.animation = 'slideOut 0.5s ease-out';
-      taskItem.addEventListener('animationend', () => {
-        taskItem.remove();
-        saveTasks();
-      });
-    }
-
-    @keyframes slideOut {
-      from { transform: translateX(0); opacity: 1; }
-      to { transform: translateX(100%); opacity: 0; }
+      taskItem.remove();
+      saveTasks();
     }
 
     function editTask(btn) {
